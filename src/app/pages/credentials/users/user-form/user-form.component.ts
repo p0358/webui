@@ -1,7 +1,9 @@
 import {
   Component, ChangeDetectionStrategy, ChangeDetectorRef, Inject, OnInit,
+  computed,
 } from '@angular/core';
 import { Validators, ReactiveFormsModule } from '@angular/forms';
+import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { MatButton } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
 import { FormBuilder } from '@ngneat/reactive-forms';
@@ -37,8 +39,6 @@ import { IxSelectComponent } from 'app/modules/forms/ix-forms/components/ix-sele
 import {
   IxModalHeaderComponent,
 } from 'app/modules/forms/ix-forms/components/ix-slide-in/components/ix-modal-header/ix-modal-header.component';
-import { IxSlideInRef } from 'app/modules/forms/ix-forms/components/ix-slide-in/ix-slide-in-ref';
-import { SLIDE_IN_DATA } from 'app/modules/forms/ix-forms/components/ix-slide-in/ix-slide-in.token';
 import {
   IxSlideToggleComponent,
 } from 'app/modules/forms/ix-forms/components/ix-slide-toggle/ix-slide-toggle.component';
@@ -48,6 +48,7 @@ import { IxValidatorsService } from 'app/modules/forms/ix-forms/services/ix-vali
 import { emailValidator } from 'app/modules/forms/ix-forms/validators/email-validation/email-validation';
 import { forbiddenValues } from 'app/modules/forms/ix-forms/validators/forbidden-values-validation/forbidden-values-validation';
 import { matchOthersFgValidator } from 'app/modules/forms/ix-forms/validators/password-validation/password-validation';
+import { IxIconComponent } from 'app/modules/ix-icon/ix-icon.component';
 import { SnackbarService } from 'app/modules/snackbar/services/snackbar.service';
 import { TestDirective } from 'app/modules/test-id/test.directive';
 import { userAdded, userChanged } from 'app/pages/credentials/users/store/user.actions';
@@ -88,6 +89,7 @@ const defaultHomePath = '/var/empty';
     MatButton,
     TestDirective,
     TranslateModule,
+    IxIconComponent,
   ],
 })
 export class UserFormComponent implements OnInit {
@@ -96,13 +98,13 @@ export class UserFormComponent implements OnInit {
   homeModeOldValue = '';
   protected readonly requiredRoles = [Role.AccountWrite];
 
-  get isNewUser(): boolean {
-    return !this.editingUser;
-  }
+  isNewUser = computed(() => !this.editingUser);
 
-  get title(): string {
-    return this.isNewUser ? this.translate.instant('Add User') : this.translate.instant('Edit User');
-  }
+  title = computed(() => {
+    return this.isNewUser()
+      ? this.translate.instant('Add User')
+      : this.translate.instant('Edit User');
+  });
 
   form = this.fb.group({
     full_name: ['', [Validators.required]],
@@ -114,13 +116,13 @@ export class UserFormComponent implements OnInit {
     email: ['', [emailValidator()]],
     password: ['', [
       this.validatorsService.validateOnCondition(
-        () => this.isNewUser,
+        () => this.isNewUser(),
         Validators.required,
       ),
     ]],
     password_conf: ['', [
       this.validatorsService.validateOnCondition(
-        () => this.isNewUser,
+        () => this.isNewUser(),
         Validators.required,
       ),
     ]],
@@ -216,14 +218,14 @@ export class UserFormComponent implements OnInit {
     private translate: TranslateService,
     private validatorsService: IxValidatorsService,
     private filesystemService: FilesystemService,
-    private slideInRef: IxSlideInRef<UserFormComponent>,
     private snackbar: SnackbarService,
     private storageService: StorageService,
     private downloadService: DownloadService,
     private store$: Store<AppState>,
     private dialog: DialogService,
     private userService: UserService,
-    @Inject(SLIDE_IN_DATA) private editingUser: User,
+    private bottomSheetRef: MatBottomSheetRef,
+    @Inject(MAT_BOTTOM_SHEET_DATA) private editingUser: User,
   ) {
     this.form.controls.smb.errors$.pipe(
       filter((error) => error?.manualValidateErrorMsg),
@@ -238,6 +240,7 @@ export class UserFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.setupForm();
+    console.info('editingUser', this.editingUser);
   }
 
   setupForm(): void {
@@ -298,7 +301,7 @@ export class UserFormComponent implements OnInit {
       this.form.controls.sudo_commands_nopasswd.disabledWhile(this.form.controls.sudo_commands_nopasswd_all.value$),
     );
 
-    if (this.isNewUser) {
+    if (this.isNewUser()) {
       this.setupNewUserForm();
     } else {
       this.setupEditUserForm(this.editingUser);
@@ -344,7 +347,7 @@ export class UserFormComponent implements OnInit {
 
         let request$: Observable<number>;
         let nextRequest$: Observable<number>;
-        if (this.isNewUser) {
+        if (this.isNewUser()) {
           request$ = this.ws.call('user.create', [{
             ...body,
             group_create: values.group_create,
@@ -374,7 +377,7 @@ export class UserFormComponent implements OnInit {
           untilDestroyed(this),
         ).subscribe({
           next: (user) => {
-            if (this.isNewUser) {
+            if (this.isNewUser()) {
               this.snackbar.success(this.translate.instant('User added'));
               this.store$.dispatch(userAdded({ user }));
             } else {
@@ -382,7 +385,7 @@ export class UserFormComponent implements OnInit {
               this.store$.dispatch(userChanged({ user }));
             }
             this.isFormLoading = false;
-            this.slideInRef.close();
+            this.bottomSheetRef.dismiss();
             this.cdr.markForCheck();
           },
           error: (error: unknown) => {
@@ -391,8 +394,6 @@ export class UserFormComponent implements OnInit {
             this.cdr.markForCheck();
           },
         });
-      },
-      complete: () => {
       },
     });
   }

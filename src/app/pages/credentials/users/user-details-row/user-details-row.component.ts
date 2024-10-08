@@ -19,6 +19,7 @@ import {
   DeleteUserDialogComponent,
 } from 'app/pages/credentials/users/user-details-row/delete-user-dialog/delete-user-dialog.component';
 import { UserFormComponent } from 'app/pages/credentials/users/user-form/user-form.component';
+import { BottomSheetService } from 'app/services/bottom-sheet.service';
 import { IxSlideInService } from 'app/services/ix-slide-in.service';
 import { UrlOptionsService } from 'app/services/url-options.service';
 
@@ -50,6 +51,7 @@ export class UserDetailsRowComponent {
     private yesNoPipe: YesNoPipe,
     private urlOptions: UrlOptionsService,
     private router: Router,
+    private bottomSheet: BottomSheetService,
   ) {}
 
   getDetails(user: User): Option[] {
@@ -94,7 +96,7 @@ export class UserDetailsRowComponent {
   }
 
   doEdit(user: User): void {
-    this.slideInService.open(UserFormComponent, { wide: true, data: user });
+    this.bottomSheet.open(UserFormComponent, { panelClass: 'full-screen', data: user });
   }
 
   doDelete(user: User): void {

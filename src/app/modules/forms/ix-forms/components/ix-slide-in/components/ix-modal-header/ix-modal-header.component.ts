@@ -5,10 +5,10 @@ import {
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { TranslateModule } from '@ngx-translate/core';
 import { Role } from 'app/enums/role.enum';
-import { IxSlideInRef } from 'app/modules/forms/ix-forms/components/ix-slide-in/ix-slide-in-ref';
 import { ReadOnlyComponent } from 'app/modules/forms/ix-forms/components/readonly-badge/readonly-badge.component';
 import { IxIconComponent } from 'app/modules/ix-icon/ix-icon.component';
 import { AuthService } from 'app/services/auth/auth.service';
+import { BottomSheetService } from 'app/services/bottom-sheet.service';
 
 @Component({
   selector: 'ix-modal-header',
@@ -33,11 +33,12 @@ export class IxModalHeaderComponent {
   readonly hasRequiredRoles = computed(() => this.authService.hasRole(this.requiredRoles()));
 
   constructor(
-    private slideInRef: IxSlideInRef<IxModalHeaderComponent>,
+    // private slideInRef: IxSlideInRef<IxModalHeaderComponent>,
+    private bottomSheet: BottomSheetService,
     private authService: AuthService,
   ) {}
 
   close(): void {
-    this.slideInRef.close();
+    this.bottomSheet.close();
   }
 }

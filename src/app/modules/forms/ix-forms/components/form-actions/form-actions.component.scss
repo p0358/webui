@@ -1,17 +1,33 @@
-:host,
-:host-context(mat-dialog-container .ix-form-container) :host {
+:host-context(ix-form-actions) {
+  align-items: center;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--lines);
+  box-sizing: border-box;
+  color: var(--fg1);
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-end;
-  margin: 0;
+  flex-gap: 8px;
+  height: 64px;
+  justify-content: space-between;
+  left: 0;
+  min-height: 64px;
+  padding: 0 16px 0 32px;
+  position: sticky;
+  top: 0;
+  word-break: break-all;
+  z-index: 1;
 }
 
-:host-context(.ix-form-container) :host {
-  flex-wrap: wrap;
+:host {
+  align-items: center;
+  display: flex;
   gap: 8px;
-  justify-content: flex-start;
-  margin: 0 10px;
+
+  .header,
+  .actions {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+  }
 }
 
 :host-context(mat-vertical-stepper) :host {

@@ -46,6 +46,7 @@ import { WebSocketService } from 'app/services/ws.service';
   styleUrls: ['./api-keys.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
+  providers: [ApiKeyComponentStore],
   imports: [
     SearchInput1Component,
     MatAnchor,

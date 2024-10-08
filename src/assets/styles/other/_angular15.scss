@@ -52,3 +52,11 @@ table td .mdc-icon-button {
   font-size: 14px;
   white-space: pre;
 }
+
+.cdk-overlay-pane.full-screen .mat-bottom-sheet-container-large {
+  max-height: 80vh;
+  max-width: 100%;
+  min-height: 80vh;
+  min-width: 80vw;
+  padding: 0;
+}

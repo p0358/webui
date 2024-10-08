@@ -1,1 +1,22 @@
-<ng-content></ng-content>
+<div class="header">
+  <h3 class="ix-formtitle">
+    {{ title() | translate }}
+  </h3>
+
+  <ng-content></ng-content>
+</div>
+
+<div class="actions">
+  <button
+    tabindex="0"
+    mat-icon-button
+    ixTest="ix-close-icon"
+    id="ix-close-icon"
+    type="button"
+    [attr.aria-label]="'Close {formType} Form' | translate: { formType: title() }"
+    (click)="close()"
+    (keydown.enter)="close()"
+  >
+    <ix-icon name="mdi-close"></ix-icon>
+  </button>
+</div>
